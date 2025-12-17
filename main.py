@@ -215,6 +215,18 @@ async def verify_page(request: Request, cid: str):
     # Pass the CID to the template - verification happens via API
     return templates.TemplateResponse("verify.html", {"request": request, "cid": cid})
 
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_page(request: Request):
+    return templates.TemplateResponse("privacy.html", {"request": request})
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page(request: Request):
+    return templates.TemplateResponse("terms.html", {"request": request})
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact_page(request: Request):
+    return templates.TemplateResponse("contact.html", {"request": request})
+
 @app.get("/api/verify/{cid}")
 async def verify_asset(cid: str):
     """

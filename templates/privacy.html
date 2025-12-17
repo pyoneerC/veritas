@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Basalt Protocol</title>
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['"Share Tech Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: { 500: '#22c55e', 900: '#14532d' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e5e5;
+        }
+
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+
+<body class="bg-grid min-h-screen">
+    <!-- Navbar -->
+    <nav class="w-full p-6 flex justify-between items-center border-b border-white/10">
+        <a href="/" class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-brand-500 rounded-sm"></div>
+            <span class="font-mono font-bold tracking-widest text-white">BASALT</span>
+        </a>
+        <a href="/" class="text-xs font-mono text-gray-500 hover:text-white transition-colors">[ RETURN TO BASE ]</a>
+    </nav>
+
+    <!-- Content -->
+    <main class="max-w-4xl mx-auto px-6 py-16">
+        <h1 class="text-4xl font-bold mb-2">Privacy Policy</h1>
+        <p class="text-gray-500 font-mono text-sm mb-12">Last updated: December 2024</p>
+
+        <div class="space-y-8 text-gray-300 leading-relaxed">
+            <section>
+                <h2 class="text-xl font-bold text-white mb-4">1. Information We Collect</h2>
+                <p>When you use Basalt Protocol, we may collect:</p>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                    <li><strong>Files you upload:</strong> Images and documents submitted for notarization</li>
+                    <li><strong>Cryptographic hashes:</strong> SHA-256 fingerprints of your files</li>
+                    <li><strong>Blockchain records:</strong> Public transaction data on Solana</li>
+                    <li><strong>Usage data:</strong> Anonymous analytics about how you use our service</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-white mb-4">2. How We Use Your Information</h2>
+                <p>We use collected information to:</p>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                    <li>Provide cryptographic signing and notarization services</li>
+                    <li>Store your files on IPFS for permanent, decentralized access</li>
+                    <li>Create immutable blockchain records of your content</li>
+                    <li>Improve and optimize our services</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-white mb-4">3. Data Storage & Security</h2>
+                <p class="text-gray-400">
+                    Files are stored on IPFS (InterPlanetary File System), a decentralized network.
+                    Once uploaded, content is distributed across multiple nodes and cannot be deleted
+                    or modified. Blockchain anchors are permanent and publicly visible on the Solana network.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-white mb-4">4. Third-Party Services</h2>
+                <p class="text-gray-400">We use the following third-party services:</p>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-400">
+                    <li><strong>Pinata:</strong> IPFS pinning and gateway services</li>
+                    <li><strong>Solana:</strong> Blockchain network for transaction anchoring</li>
+                    <li><strong>DigiCert:</strong> Timestamp authority for C2PA signatures</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-white mb-4">5. Your Rights</h2>
+                <p class="text-gray-400">
+                    Due to the nature of blockchain and IPFS technology, data cannot be deleted once
+                    submitted. Please only submit content you have the right to notarize and are
+                    comfortable being permanently recorded.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-white mb-4">6. Contact</h2>
+                <p class="text-gray-400">
+                    For privacy-related inquiries, please contact us at
+                    <a href="mailto:privacy@basaltprotocol.com"
+                        class="text-brand-500 hover:underline">privacy@basaltprotocol.com</a>
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 mt-16">
+        <div class="max-w-4xl mx-auto px-6 flex justify-between items-center text-sm text-gray-500">
+            <span>© 2024 Basalt Protocol</span>
+            <div class="flex gap-6">
+                <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
+                <a href="/terms" class="hover:text-white transition-colors">Terms</a>
+                <a href="/contact" class="hover:text-white transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
