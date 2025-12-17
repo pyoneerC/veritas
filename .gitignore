@@ -34,3 +34,8 @@ inspection.txt
 .idea/
 .DS_Store
 Thumbs.db
+
+# Test files
+reproduce_issue.py
+setup_certs.py
+test_full_pipeline.py

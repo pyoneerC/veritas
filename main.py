@@ -12,7 +12,10 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
 # Crypto & Blockchain Libraries
-from c2pa import Builder, Signer, C2paSignerInfo, C2paSigningAlg
+from c2pa import Builder, Signer, C2paSigningAlg
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.backends import default_backend
 from solana.rpc.api import Client
 from solders.keypair import Keypair
 from solders.transaction import Transaction
@@ -55,29 +58,44 @@ def sign_with_c2pa(input_path, output_path):
     """
     Injects a 'Digital Signature' into the image.
     This proves the image was processed by 'Basalt'.
+    Uses the official c2pa-python callback signer approach.
     """
-    manifest_json = json.dumps({
+    manifest_definition = {
         "claim_generator": "Basalt_Protocol_v1",
+        "claim_generator_info": [{
+            "name": "Basalt_Protocol",
+            "version": "1.0.0",
+        }],
+        "format": "image/jpeg",
+        "title": "Basalt Verified Image",
         "assertions": [
             {
                 "label": "c2pa.actions",
-                "data": {"actions": [{"action": "c2pa.created"}]}
-            },
-            {
-                "label": "stds.schema-org.CreativeWork",
-                "data": {"author": [{"@type": "Organization", "name": "Basalt Notary"}]}
+                "data": {
+                    "actions": [
+                        {
+                            "action": "c2pa.created",
+                            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCreation"
+                        }
+                    ]
+                }
             }
         ]
-    })
+    }
     
     # Load Certs (File or Env)
     sign_cert = None
     private_key = None
     
-    if os.path.exists("my_cert.pem") and os.path.exists("my_private_key.pem"):
-        with open("my_cert.pem", "rb") as f:
+    # Use absolute paths relative to this script
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    cert_path = os.path.join(base_dir, "my_cert.pem")
+    key_path = os.path.join(base_dir, "my_private_key.pem")
+    
+    if os.path.exists(cert_path) and os.path.exists(key_path):
+        with open(cert_path, "rb") as f:
             sign_cert = f.read()
-        with open("my_private_key.pem", "rb") as f:
+        with open(key_path, "rb") as f:
             private_key = f.read()
     else:
         # Fallback to Env Vars (for Vercel)
@@ -89,25 +107,38 @@ def sign_with_c2pa(input_path, output_path):
     
     if not sign_cert or not private_key:
          raise Exception("Certificates missing. Set BASALT_CERT_PEM/BASALT_KEY_PEM env vars or ensure .pem files exist.")
-        
-    # Use PS256 for RSA keys (matches setup_certs.py)
-    try:
-        info = C2paSignerInfo(
-            C2paSigningAlg.PS256,
-            sign_cert,
-            private_key,
-            "" # Disable TSA for self-signed certs
-        )
-        signer = Signer.from_info(info)
-    except Exception as e:
-        # Fallback for debug: print detailed error
-        logger.error(f"Failed to create signer: {e}")
-        raise
-
-    builder = Builder(manifest_json)
     
-    # Perform the signing
-    builder.sign_file(input_path, output_path, signer)
+    logger.info(f"Cert path: {cert_path}, size: {len(sign_cert)}")
+    logger.info(f"Key path: {key_path}, size: {len(private_key)}")
+    
+    # Define a callback signer function (recommended approach)
+    def callback_signer_es256(data: bytes) -> bytes:
+        """Callback function that signs data using ES256 algorithm."""
+        key_obj = serialization.load_pem_private_key(
+            private_key,
+            password=None,
+            backend=default_backend()
+        )
+        signature = key_obj.sign(
+            data,
+            ec.ECDSA(hashes.SHA256())
+        )
+        return signature
+        
+    # Use the callback signer approach (official method)
+    try:
+        with Signer.from_callback(
+            callback=callback_signer_es256,
+            alg=C2paSigningAlg.ES256,
+            certs=sign_cert.decode('utf-8'),
+            tsa_url="http://timestamp.digicert.com"
+        ) as signer:
+            with Builder(manifest_definition) as builder:
+                builder.sign_file(input_path, output_path, signer)
+    except Exception as e:
+        logger.error(f"Failed to sign with C2PA: {e}")
+        raise
+    
     return output_path
 
 def upload_to_ipfs(file_path):
@@ -195,8 +226,17 @@ async def notarize(file: UploadFile = File(...)):
     signed_filename = os.path.join(tmp_dir, f"signed_{int(time.time())}.jpg")
     
     try:
-        with open(temp_filename, "wb") as buffer:
-            buffer.write(await file.read())
+        # Load and sanitize image to JPG (Fixes potential PNG/format issues)
+        from PIL import Image
+        import io
+        
+        content = await file.read()
+        image = Image.open(io.BytesIO(content))
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+            
+        # Save as clean JPG
+        image.save(temp_filename, "JPEG", quality=95)
             
         # 2. C2PA Signing (The "Truth" Layer)
         sign_with_c2pa(temp_filename, signed_filename)
