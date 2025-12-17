@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+c2pa-python
+solana
+solders
+requests
+jinja2
+python-dotenv

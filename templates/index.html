@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veritas Protocol | The Standard for Digital Truth</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['"Share Tech Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e', // Green-500
+                            600: '#16a34a',
+                            900: '#14532d',
+                            accent: '#00ff41', // Hackers Green
+                        },
+                        dark: {
+                            900: '#050505',
+                            800: '#0a0a0a',
+                            700: '#171717',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scanline 8s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scanline: {
+                            '0%': { backgroundPosition: '0 0' },
+                            '100%': { backgroundPosition: '0 100%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+
+        /* Subtle Grid Background */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Glowing Text Utilities */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+
+        .glass-panel {
+            background: rgba(23, 23, 23, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Scanline Effect */
+        .scan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #86efac);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .loader {
+            border: 3px solid rgba(34, 197, 94, 0.1);
+            border-left-color: #22c55e;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .logo-grayscale {
+            filter: grayscale(100%) opacity(0.6);
+            transition: all 0.3s;
+        }
+
+        .logo-grayscale:hover {
+            filter: grayscale(0%) opacity(1);
+        }
+    </style>
+</head>
+
+<body class="antialiased bg-grid selection:bg-brand-500 selection:text-black">
+    <div class="scan-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 top-0 transition-all duration-300 glass-panel border-b-0 border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-3 group cursor-pointer">
+                    <div
+                        class="w-8 h-8 bg-brand-500 rounded-sm flex items-center justify-center transform group-hover:rotate-45 transition-transform duration-300">
+                        <div class="w-4 h-4 bg-black"></div>
+                    </div>
+                    <span
+                        class="font-mono text-xl font-bold tracking-widest text-white group-hover:text-brand-400 transition-colors">VERITAS</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-light tracking-wide text-gray-400">
+                    <a href="#how-it-works" class="hover:text-white transition-colors">PLATORM</a>
+                    <a href="#developers" class="hover:text-white transition-colors">DEVELOPERS</a>
+                    <a href="#demo" class="hover:text-white transition-colors text-brand-400 font-bold">[ LIVE DEMO
+                        ]</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div
+            class="absolute top-0 right-0 -mr-40 -mt-40 w-[600px] h-[600px] bg-brand-500/10 rounded-full blur-[100px] animate-pulse-slow">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 -ml-40 -mb-40 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px]">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-brand-400 mb-8 animate-fade-in-up"
+                style="animation-delay: 0.1s;">
+                <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                SYSTEM OPERATIONAL // V1.0.4
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-8 animate-fade-in-up"
+                style="animation-delay: 0.2s;">
+                <span class="block">Trust is no longer</span>
+                <span class="gradient-text">Assumed. It is Proven.</span>
+            </h1>
+
+            <p class="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed animate-fade-in-up"
+                style="animation-delay: 0.3s;">
+                The Veritas Protocol anchors digital media to the blockchain, establishing an immutable chain of custody
+                for every pixel, frame, and document.
+            </p>
+
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up"
+                style="animation-delay: 0.4s;">
+                <a href="#demo"
+                    class="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold text-sm tracking-widest hover:bg-gray-200 transition-all transform hover:-translate-y-1 rounded-sm">
+                    START NOTARIZING
+                </a>
+                <a href="#how-it-works"
+                    class="w-full sm:w-auto px-8 py-4 border border-white/20 text-white font-mono text-sm hover:bg-white/5 transition-all rounded-sm flex items-center justify-center gap-2">
+                    READ WHITE PAPER
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <div class="border-y border-white/5 bg-white/[0.02]">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <p class="text-center text-xs font-mono text-gray-600 mb-12 uppercase tracking-[0.2em]">Trusted Architecture
+                Components</p>
+            <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24">
+
+                <span class="text-xl font-bold font-sans">SOLANA</span>
+                <span class="text-xl font-bold font-serif">C2PA</span>
+                <span class="text-xl font-bold font-mono">IPFS</span>
+                <span class="text-xl font-bold font-sans italic">DigiCert</span>
+                <span class="text-xl font-bold font-serif">Pinata</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works (The Engine) -->
+    <section id="how-it-works" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="mb-16 md:mb-24">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">The Provenance Engine</h2>
+                <div class="w-20 h-1 bg-brand-500"></div>
+                <p class="mt-6 text-gray-400 max-w-xl">
+                    Veritas combines three layers of security to create a tamper-proof record.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="glass-panel p-8 rounded-xl hover:border-brand-500/50 transition-colors group">
+                    <div
+                        class="text-brand-500 font-mono text-5xl mb-6 opacity-30 group-hover:opacity-100 transition-opacity">
+                        01</div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Cryptographic Signing</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        We inject a C2PA standard manifest implementation into the file metadata, signing it with X.509
+                        certificates.
+                    </p>
+                </div>
+                <!-- Step 2 -->
+                <div class="glass-panel p-8 rounded-xl hover:border-blue-500/50 transition-colors group">
+                    <div
+                        class="text-blue-500 font-mono text-5xl mb-6 opacity-30 group-hover:opacity-100 transition-opacity">
+                        02</div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Decentralized Storage</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The signed asset is pinned to IPFS (InterPlanetary File System), ensuring redundancy and
+                        censorship resistance.
+                    </p>
+                </div>
+                <!-- Step 3 -->
+                <div class="glass-panel p-8 rounded-xl hover:border-purple-500/50 transition-colors group">
+                    <div
+                        class="text-purple-500 font-mono text-5xl mb-6 opacity-30 group-hover:opacity-100 transition-opacity">
+                        03</div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Blockchain Anchoring</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        A hash of the asset is written to the Solana blockchain, creating an indisputable timestamp of
+                        existence.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo Section -->
+    <section id="demo" class="py-24 relative bg-brand-900/10 border-y border-white/5">
+        <div class="absolute inset-0 bg-grid opacity-20"></div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-12">
+                <span class="text-brand-400 font-mono text-sm tracking-widest">[ SYSTEM ACCESS ]</span>
+                <h2 class="text-3xl font-bold mt-2">Secure Your Assets Now</h2>
+                <p class="text-gray-400 mt-2">Upload a file to generate a notarized certificate.</p>
+            </div>
+
+            <!-- The App/Interface -->
+            <div class="glass-panel p-1 rounded-2xl shadow-2xl shadow-brand-500/10">
+                <div class="bg-black/80 rounded-xl p-8 md:p-12 relative overflow-hidden">
+
+                    <!-- Form -->
+                    <form id="uploadForm" hx-post="/notarize" hx-encoding="multipart/form-data" hx-swap="none"
+                        hx-indicator="#loading">
+                        <label class="block w-full cursor-pointer group relative">
+                            <div
+                                class="border-2 border-dashed border-gray-700 group-hover:border-brand-500 transition-all duration-500 p-16 text-center rounded-lg bg-white/5 group-hover:bg-white/[0.07]">
+                                <div
+                                    class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                    <svg class="w-8 h-8 text-gray-400 group-hover:text-brand-400" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-lg text-white font-medium block mb-1">Drop evidence here</span>
+                                <span class="text-sm text-gray-500 font-mono">Support: JPG, PNG, TIFF</span>
+                                <div id="file-name"
+                                    class="mt-4 text-xs font-mono text-brand-400 hidden bg-brand-900/30 py-1 px-3 rounded inline-block border border-brand-500/30">
+                                </div>
+                            </div>
+                            <input type="file" name="file" class="hidden"
+                                onchange="const f=this.files[0]; if(f){const el=document.getElementById('file-name'); el.innerText = '[ LOADED: ' + f.name.toUpperCase() + ' ]'; el.classList.remove('hidden');}">
+                        </label>
+
+                        <div class="mt-8 flex flex-col items-center">
+                            <button type="submit"
+                                class="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-brand-600 rounded-lg hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 ring-offset-black w-full md:w-auto">
+                                <span
+                                    class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                                <span class="relative flex items-center gap-2 uppercase tracking-widest">
+                                    Initialize Notarization
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <!-- Loading State -->
+                            <div id="loading" class="htmx-indicator mt-6 flex items-center gap-3">
+                                <div class="loader"></div>
+                                <span class="font-mono text-xs text-brand-400 animate-pulse">ESTABLISHING
+                                    PROVENANCE...</span>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Results Area -->
+                    <div id="result-area" class="mt-8"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Developer Section -->
+    <section id="developers" class="py-24 bg-black">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="flex-1">
+                    <h2 class="text-3xl font-bold mb-6">Built for Integration</h2>
+                    <p class="text-gray-400 mb-8 leading-relaxed">
+                        Veritas is API-first. Integrate rigorous provenance checks into your existing CMS, DAM, or
+                        workflow with just a few lines of code.
+                    </p>
+                    <ul class="space-y-4 font-mono text-sm text-gray-400">
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Python & Node.js SDKs
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Webhooks for async processing
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            White-label verification pages
+                        </li>
+                    </ul>
+                </div>
+                <div class="flex-1 w-full">
+                    <div
+                        class="bg-gray-900 rounded-lg p-6 border border-white/10 shadow-2xl font-mono text-xs md:text-sm overflow-x-auto">
+                        <div class="flex gap-2 mb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <pre class="text-gray-300">
+<span class="text-purple-400">import</span> veritas
+
+<span class="text-gray-500"># Initialize Client</span>
+client = veritas.Client(api_key=<span class="text-green-400">"v_live_..."</span>)
+
+<span class="text-gray-500"># Sign & Anchor</span>
+evidence = client.notarize(
+    file=<span class="text-green-400">"cctv_footage_04.mp4"</span>,
+    meta={
+        <span class="text-green-400">"location"</span>: <span class="text-green-400">"Sector 7"</span>,
+        <span class="text-green-400">"author"</span>: <span class="text-green-400">"SecCorp_Device_A"</span>
+    }
+)
+
+<span class="text-blue-400">print</span>(evidence.solana_tx)
+<span class="text-gray-500"># > "2zN8...3jK9"</span>
+</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-12 bg-black">
+        <div
+            class="max-w-7xl mx-auto px-6 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="font-mono text-xl font-bold text-white tracking-widest">VERITAS</span>
+                <p class="text-xs text-gray-600 mt-2">© 2026 Veritas Protocol Inc.</p>
+            </div>
+            <div class="flex gap-8 text-sm text-gray-500 font-light">
+                <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                <a href="#" class="hover:text-white transition-colors">Terms</a>
+                <a href="#" class="hover:text-white transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        document.body.addEventListener('htmx:afterRequest', function (evt) {
+            if (evt.detail.successful) {
+                try {
+                    const response = JSON.parse(evt.detail.xhr.response);
+                    const resultArea = document.getElementById('result-area');
+                    const loadingIndicator = document.getElementById('loading');
+
+                    // Force hide loading
+                    loadingIndicator.classList.add('hidden');
+
+                    if (response.error) {
+                        resultArea.innerHTML = `
+                            <div class="bg-red-900/20 border border-red-500/50 p-6 rounded-lg text-center animate-fade-in-up">
+                                <span class="text-red-500 font-bold block mb-2">Detailed Error Log</span>
+                                <span class="font-mono text-red-200 text-sm">${response.error}</span>
+                            </div>
+                        `;
+                    } else {
+                        const e = response.evidence;
+                        resultArea.innerHTML = `
+                            <div class="bg-brand-900/10 border border-brand-500/30 rounded-xl p-8 animate-fade-in-up backdrop-blur-sm relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-4 opacity-20">
+                                    <svg class="w-32 h-32 text-brand-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                                </div>
+                                
+                                <div class="relative z-10">
+                                    <div class="flex items-center gap-3 mb-6">
+                                        <div class="h-3 w-3 bg-brand-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></div>
+                                        <h3 class="text-white text-xl font-bold tracking-wide">CERTIFICATE GENERATED</h3>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-mono">
+                                        <div class="bg-black/40 p-4 rounded border border-white/5">
+                                            <span class="block text-gray-500 text-xs mb-1">ASSET HASH (SHA-256)</span>
+                                            <span class="text-brand-400 break-all">${e.sha256_hash}</span>
+                                        </div>
+                                        <div class="bg-black/40 p-4 rounded border border-white/5">
+                                            <span class="block text-gray-500 text-xs mb-1">C2PA SIGNATURE</span>
+                                            <span class="text-green-500 flex items-center gap-2">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                                VALID (ES256)
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                                        <a href="${e.solana_tx}" target="_blank" class="flex-1 py-3 px-4 rounded bg-purple-600/20 border border-purple-500/50 text-purple-300 hover:bg-purple-600/30 transition text-center flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            View On-Chain Proof
+                                        </a>
+                                        <a href="${e.ipfs_url}" target="_blank" class="flex-1 py-3 px-4 rounded bg-blue-600/20 border border-blue-500/50 text-blue-300 hover:bg-blue-600/30 transition text-center flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4"></path></svg>
+                                            Download from Vault
+                                        </a>
+                                        <a href="https://contentcredentials.org/verify" target="_blank" class="flex-1 py-3 px-4 rounded bg-white/5 border border-white/20 text-white hover:bg-white/10 transition text-center flex items-center justify-center gap-2">
+                                            Verify Certificate
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

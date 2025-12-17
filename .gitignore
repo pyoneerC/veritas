@@ -1,0 +1,36 @@
+# Python Standard
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.pytest_cache/
+
+# Environment Variables (SECRETS)
+.env
+.env.local
+
+# Crypto & Keys (EXTREMELY IMPORTANT)
+*.pem
+*.key
+*.csr
+*.srl
+*.crt
+*.p12
+*.pfjg
+
+# Project Artifacts (Temporary Files)
+temp_*.jpg
+signed_*.jpg
+uploads/
+
+# Logs & Debugging
+*.log
+debug_*.py
+debug_output*.txt
+inspection.txt
+
+# Editor Config
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
