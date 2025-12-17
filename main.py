@@ -36,6 +36,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("basalt")
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Initialize Solana Client
@@ -232,36 +233,61 @@ async def verify_asset(cid: str):
         "error": None
     }
     
-    # Try to fetch from IPFS gateway
-    ipfs_url = f"https://gateway.pinata.cloud/ipfs/{cid}"
+    # Try multiple IPFS gateways (fallback for rate limiting)
+    gateways = [
+        f"https://gateway.pinata.cloud/ipfs/{cid}",
+        f"https://ipfs.io/ipfs/{cid}",
+        f"https://cloudflare-ipfs.com/ipfs/{cid}",
+    ]
     
     try:
         logger.info(f"Verifying CID: {cid}")
         
-        # Check if file exists on IPFS
-        response = requests.head(ipfs_url, timeout=10)
+        for ipfs_url in gateways:
+            try:
+                # Check if file exists on IPFS
+                response = requests.head(ipfs_url, timeout=10)
+                
+                if response.status_code == 200:
+                    result["ipfs_exists"] = True
+                    
+                    # Download the file to compute hash
+                    file_response = requests.get(ipfs_url, timeout=30)
+                    if file_response.status_code == 200:
+                        file_hash = hashlib.sha256(file_response.content).hexdigest()
+                        result["hash"] = file_hash
+                        result["verified"] = True
+                        result["file_size"] = len(file_response.content)
+                        result["gateway_used"] = ipfs_url.split('/ipfs/')[0]
+                        logger.info(f"Verification SUCCESS for {cid}")
+                        return JSONResponse(result)
+                    elif file_response.status_code == 429:
+                        logger.warning(f"Rate limited on {ipfs_url}, trying next gateway...")
+                        continue
+                    else:
+                        result["error"] = f"Failed to download file: HTTP {file_response.status_code}"
+                elif response.status_code == 429:
+                    # Rate limited - try next gateway
+                    logger.warning(f"Rate limited on {ipfs_url}, trying next gateway...")
+                    continue
+                elif response.status_code == 404:
+                    # File not found - this is definitive
+                    result["error"] = "File not found on IPFS"
+                    break
+                else:
+                    continue
+                    
+            except requests.exceptions.Timeout:
+                logger.warning(f"Timeout on {ipfs_url}, trying next gateway...")
+                continue
+            except requests.exceptions.ConnectionError:
+                logger.warning(f"Connection error on {ipfs_url}, trying next gateway...")
+                continue
         
-        if response.status_code == 200:
-            result["ipfs_exists"] = True
+        # If we get here without returning, all gateways failed
+        if not result["error"]:
+            result["error"] = "All IPFS gateways failed or rate limited. Please try again in a few seconds."
             
-            # Download the file to compute hash
-            file_response = requests.get(ipfs_url, timeout=30)
-            if file_response.status_code == 200:
-                file_hash = hashlib.sha256(file_response.content).hexdigest()
-                result["hash"] = file_hash
-                result["verified"] = True
-                result["file_size"] = len(file_response.content)
-                logger.info(f"Verification SUCCESS for {cid}")
-            else:
-                result["error"] = f"Failed to download file: HTTP {file_response.status_code}"
-        else:
-            result["error"] = f"File not found on IPFS (HTTP {response.status_code})"
-            logger.warning(f"CID not found: {cid}")
-            
-    except requests.exceptions.Timeout:
-        result["error"] = "IPFS gateway timeout"
-    except requests.exceptions.ConnectionError:
-        result["error"] = "Cannot connect to IPFS gateway"
     except Exception as e:
         result["error"] = str(e)
         logger.error(f"Verification error: {e}")
